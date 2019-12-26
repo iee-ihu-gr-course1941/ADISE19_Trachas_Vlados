@@ -45,6 +45,8 @@ CREATE TABLE `GameStatus` (
   `current_player` int(11) NOT NULL,
   `last_played` int(11) NOT NULL,
   `last_changed` timestamp NULL DEFAULT NULL,
+  `user1` varchar(250) NULL,
+  `user2` varchar(250) NULL,
   PRIMARY KEY (`s_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
