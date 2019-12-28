@@ -35,6 +35,7 @@ function get_players_hand($username){
 
 function draw_card($username){
 	require_once "dbconnect2.php";
+	
 
 }
 
