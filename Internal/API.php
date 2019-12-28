@@ -10,7 +10,7 @@ switch ($r=array_shift($request)) {
 
 	case 'hand' : handle_hand($method,$request[0]);break;//to request einai to poios user einai
 	
-	case 'status': handle_status($method,$request[0]);break;//to request einai to poios user einai
+	case 'draw': handle_draw($method,$request[0]);break;//to request einai to poios user einai
 
 	default: header("HTTP/1.1 404 Not Fount");break;
 }
@@ -33,7 +33,7 @@ function handle_hand($method,$username){
 }
 function handle_status($method,$username){
 	if ($method === 'POST') {
-		get_game_status($username);
+		draw_card($username);
 	}else{
 		header("HTTP/1.1 404 Wrong End");
 	}

@@ -33,7 +33,7 @@ function get_players_hand($username){
 	$mysqli->close();	
 }
 
-function get_game_status($username){
+function draw_card($username){
 	require_once "dbconnect2.php";
 
 }
