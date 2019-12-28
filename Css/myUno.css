@@ -21,7 +21,7 @@
 
 	width:150px;
 	height:200px;
-	background-image: url("https://opengameart.org/sites/default/files/UNO-Back_0.png");
+	background-image: url('../Internal/unoBack.png');
 }
 /*mid div*/
 #board {
@@ -36,14 +36,20 @@
 	width:220px;
 	height:350px;
 }
-#board_center img{
-	opacity: 0.5;
+.board_card{
+	text-align: center;
+	border: 4px solid black;
+	line-height: 350px;
+	font-size: 120px;
+	font-weight: bold;
+	color:white;
+	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+	font-family:Impact;
+
 	width:220px;
 	height:350px;
-	display: block;
-  	margin-left: auto;
-  	margin-right: auto;
 }
+
 #deck{
 	position:absolute;
 	top:0;
@@ -62,15 +68,12 @@
 	height:25%;
 }
 
-.hand{
+#hand{
 	height: 100%;
 	overflow-y: scroll;
 }
-.hand img{
-	width:150px;
-	height:200px;
-}
-.card{
+
+.hand_card{
 	position: relative;
 	text-align: center;
 	border: 2px solid black;
@@ -84,4 +87,20 @@
 	float:left;
 	width:150px;
 	height:200px;
+}
+
+/*buttons*/
+.buttons{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+button{
+	background-color: #3399ff;
+	border: 1px solid black;
+	color: white;
+	padding: 20px 45px;
+	font-size: 30px;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	font-weight: bold;
 }
