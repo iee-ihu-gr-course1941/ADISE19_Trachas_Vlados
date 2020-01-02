@@ -1,5 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `it154549` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `it154549`;
+CREATE DATABASE  IF NOT EXISTS `uno_db` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
 -- MySQL dump 10.13  Distrib 8.0.18, for Win64 (x86_64)
 --
 -- Host: localhost    Database: it154549
@@ -41,7 +41,6 @@ DROP TABLE IF EXISTS `GameStatus`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `GameStatus` (
   `s_id` int(11) NOT NULL AUTO_INCREMENT,
-  `deck_counter` int(11) NOT NULL,
   `current_player` int(11) NOT NULL,
   `last_played` int(11) NOT NULL,
   `last_changed` timestamp NULL DEFAULT NULL,
