@@ -10,19 +10,22 @@
     <title>Uno Card Game</title>
 
     <!-- calls -->
-    <link href="css/myUno.css" type="text/css" rel="stylesheet">
+    <link href="css/myUno.css?t=125" type="text/css" rel="stylesheet">
     <script src="bootstrap/jquery-3.2.1.min.js"></script>
     <script src="bootstrap/bootstrap.min.js"></script>
-    <script src="js/myuno.js"></script>
+    <script type="text/javascript" src="js/myuno.js?t=123"></script>
   </head>
-<body style="background-color:#ff751a;">
+<body style="background-color:#ff751a;" onload="start_game()">
 
 <div id='opponent_hand'>
-    <p id='opponent_cards'>0</p>
+
+    <p id='opponent_cards'></p>
 </div>
 
 <div id='board'>
-
+    <input id="username">
+    </br>
+    <button id='game_login'>ΕΙΣΟΔΟΣ ΣΤΟ ΠΑΙΧΝΙΔΙ</button>
     <div id='board_center'>
     </div>
 
@@ -31,16 +34,12 @@
     </div>
     <div class="buttons">
             <button id='draw_button'>Draw</button>
-            <button id="pass_button">Pass</button>
+            <button id='pass_button'>Pass</button>
     </div>
 </div>
 
 <div id='player_hand'>
-    
     <div id='hand'>
-    	<?php
-    	require_once('Internal/game.php');
-    	?>
     </div>
 </div>
 

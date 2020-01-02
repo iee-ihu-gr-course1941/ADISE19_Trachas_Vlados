@@ -1,26 +1,39 @@
+var opponent_username='traxas';
+
 $(function()
 {
+	$('#game_login').click( login_to_game);
 	$('#draw_button').click( draw_card);
 	$('#pass_button').click( give_turn);
 });
 
+function login_to_game()
+{
+	if($('#username').val()=='') {
+		alert('You have to set a username');
+		return;
+	}
+	start_game();
+}
+
+
 function start_game()
 {
 	give_turn();
-	$.ajax({url: "Internal/API.php/start_game", method: 'POST', success: draw_starting_hand });
+	$.ajax({url: "Internal/API.php/start_game", method: 'PUT', success: draw_starting_hand });
 }
 
 function draw_starting_hand()
 {
 	$.ajax({url: "Internal/API.php/hand/vlado", success: draw_cards});
+	check_enemy_hand();
 }
-function draw_cards(data)
+function draw_cards(data)//trabaei tis prwtes kartes
 {
 	h_cards=JSON.parse(data);
 	for(var i=0;i<h_cards.length;i++)
 	{
-		print_card(i,"blue","hand_card");
-		//$.ajax({url: "API.php/draw/vlado", success: print_card});
+		print_card(h_cards[i]);
 	}
 	get_turn();
 }
@@ -28,19 +41,30 @@ function draw_cards(data)
 function draw_card()
 {
 	document.getElementById('draw_button').disabled = true;
-	//$.ajax({url: "API.php/draw/vlado", success: print_card});
+	$.ajax({url: "Internal/API.php/draw/vlado", success: print_card});
 }
 
-function print_card(card_number,card_color,place)
+function print_card(data,place)//place = hand_card OR place = board_card
 {
-	card_id=card_number;//na to allaksw
+	place = typeof a !== 'undefined' ? a : "hand_card";
+	new_card=JSON.parse(data);
+	card_id=new_card["card_id"];
+	card_number=new_card["number"];
+	card_color=new_card["color"];	
+
 	var card = document.createElement("div");
 	card.classList.add(place);
 	card.setAttribute("id", card_id);
-	card.setAttribute("onclick", "play_card(this.id)");
 	card.style.background=card_color;
 	card.innerHTML=card_number;
-	document.getElementById('hand').appendChild(card);
+	if (place == "hand_card") 
+	{
+		card.setAttribute("onclick", "play_card(this.id)");
+		document.getElementById('hand').appendChild(card);
+	}else if(place == "board_card")
+	{
+		$('#board_center').html(card);
+	}
 }
 
 
@@ -67,4 +91,20 @@ function give_turn()
 {
 	document.getElementById('draw_button').disabled=true;
 	document.getElementById('pass_button').disabled=true;
+}
+
+function check_enemy_hand()
+{
+	$.ajax({url: "Internal/API.php/hand/".concat(opponent_username), success: update_enemy_hand});
+}
+function update_enemy_hand(data)
+{
+	cards=JSON.parse(data);
+	document.getElementById('opponent_cards').innerHTML= cards.length;
+}
+
+
+function win_game()
+{
+
 }
