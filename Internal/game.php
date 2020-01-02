@@ -84,7 +84,7 @@ function deck_ended(){
     }
 }
 
-function start_game(){
+function start_game($user1,$user2){
 	require_once "dbconnect2.php";
 	require_once 'deck.php';
 	$numbers=range(0,107);
@@ -93,12 +93,12 @@ function start_game(){
 	$delete = "TRUNCATE deck";
 	$mysqli->query($delete);
 
-    for ($i=1; $i < 107  ; $i++) { 
+    for ($i=1; $i < 108 ; $i++) { 
     	$position = $numbers[$i];
     	$deck = "INSERT INTO deck Values('$i','deck','$position')";
     	$mysqli->query($deck);
     }
-
+    
     $first = "UPDATE deck Set card_status='down' Where deck_position='0'";
 	$mysqli->query($first);
 
@@ -107,12 +107,23 @@ function start_game(){
     	$h1 = "UPDATE deck Set card_status='user1' Where deck_position='$i'";
     	$mysqli->query($h1);
     }
-
+    
     for ($i=8; $i <15 ; $i++) { 
     	
     	$h2 = "UPDATE deck Set card_status='user2' Where deck_position='$i'";
     	$mysqli->query($h2);
     }
+    
+    $down =  mysqli_query($mysqli,"SELECT card_id From deck Where card_status='down'");
+    while ($d = mysqli_fetch_assoc($down)) {
+    	$down_card = $d['card_id'];
+    }
+
+    $deleteS = "TRUNCATE gamestatus";
+	$mysqli->query($deleteS);
+
+    $status = "INSERT INTO gamestatus Values('0','1','$down_card',null,'$user1','$user2')";
+	$mysqli->query($status);
 }
 
 function play($username,$card){
@@ -124,19 +135,25 @@ function play($username,$card){
 			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card";
 			$mysqli->query($play);
 			
-			$deck = "SELECT deck_counter FROM gamestatus WHERE last_changed=(SELECT MAX(last_changed) FROM gamestatus)";
-			$result = $mysqli->query($deck);
-			$cc = $result->fetch_assoc();
-			
-			$counter = $cc['deck_counter'];
-			$counter--;
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
 			
-			$status_update = "INSERT INTO gamestatus VALUES('0','$counter','1','$card',null,'$user1','$user2')";
+			$status_update = "INSERT INTO gamestatus VALUES('0','1','$card',null,'$user1','$user2')";
+			$mysqli->query($status_update);
+			
+		}elseif ($username === $r['user2']) {
+			
+			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card";
+			$mysqli->query($play);
+			
+			$user1 = $r['user1'];
+			$user2 = $r['user2'];
+			
+			$status_update = "INSERT INTO gamestatus VALUES('0','2','$card',null,'$user1','$user2')";
 			$mysqli->query($status_update);
 			
 		}
 	}
 }
+
 ?>
