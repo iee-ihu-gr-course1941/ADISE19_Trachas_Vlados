@@ -39,11 +39,29 @@ function draw_card($username){
 	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
 	while ($r = mysqli_fetch_assoc($users)) {
 		if ($username === $r['user1']) {
-			
-			
-    	}elseif ($username === $r['user2']) {
+			$last_played = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
+			while($l= mysqli_fetch_assoc($last_played)){
+				$ls = $l['card_id'];
+			}			
 
+			$h1 = "UPDATE deck Set card_status='user1' Where card_id='$ls'";
+    		$mysqli->query($h1);
+
+			$card_info = $deck[$ls];
+			echo json_encode($card_info);
+
+
+    	}elseif ($username === $r['user2']) {
+    		$last_played = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
+			while($l= mysqli_fetch_assoc($last_played)){
+				$ls = $l['card_id'];
+			}			
 			
+			$h2 = "UPDATE deck Set card_status='user2' Where card_id='$ls'";
+    		$mysqli->query($h2);
+			
+			$card_info = $deck[$ls];
+			echo json_encode($card_info);
     	}
 	}
 	$mysqli->close();
@@ -95,5 +113,30 @@ function start_game(){
     	$h2 = "UPDATE deck Set card_status='user2' Where deck_position='$i'";
     	$mysqli->query($h2);
     }
+}
+
+function play($username,$card){
+	require_once "dbconnect2.php";
+	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
+	while ($r = mysqli_fetch_assoc($users)) {
+		if ($username === $r['user1']) {
+			
+			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card";
+			$mysqli->query($play);
+			
+			$deck = "SELECT deck_counter FROM gamestatus WHERE last_changed=(SELECT MAX(last_changed) FROM gamestatus)";
+			$result = $mysqli->query($deck);
+			$cc = $result->fetch_assoc();
+			
+			$counter = $cc['deck_counter'];
+			$counter--;
+			$user1 = $r['user1'];
+			$user2 = $r['user2'];
+			
+			$status_update = "INSERT INTO gamestatus VALUES('0','$counter','1','$card',null,'$user1','$user2')";
+			$mysqli->query($status_update);
+			
+		}
+	}
 }
 ?>
