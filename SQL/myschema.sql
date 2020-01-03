@@ -2,7 +2,7 @@ CREATE DATABASE  IF NOT EXISTS `uno_db` /*!40100 DEFAULT CHARACTER SET utf8 */;
 
 -- MySQL dump 10.13  Distrib 8.0.18, for Win64 (x86_64)
 --
--- Host: localhost    Database: it154549
+-- Host: localhost    Database: uno_db
 -- ------------------------------------------------------
 -- Server version	5.6.39-1~dotdeb+7.1
 
@@ -58,7 +58,7 @@ CREATE TABLE `GameStatus` (
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`it154549`@`%`*/ /*!50003 TRIGGER game_status_update BEFORE INSERT
+/*!50003 CREATE*/ /*!50003 TRIGGER game_status_update BEFORE INSERT
 ON GameStatus
 FOR EACH ROW BEGIN
 SET NEW.last_changed = NOW();
@@ -70,11 +70,11 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
--- Dumping events for database 'it154549'
+-- 
 --
 
 --
--- Dumping routines for database 'it154549'
+-- 
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
