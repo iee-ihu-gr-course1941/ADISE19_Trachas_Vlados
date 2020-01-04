@@ -57,12 +57,11 @@ CREATE TABLE `GameStatus` (
 /*!50003 SET collation_connection  = utf8mb4_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50003 TRIGGER game_status_update BEFORE INSERT
-ON GameStatus
-FOR EACH ROW BEGIN
+DELIMITER $$
+CREATE TRIGGER `game_status_update` BEFORE UPDATE ON GameStatus FOR EACH ROW BEGIN
 SET NEW.last_changed = NOW();
-END */;;
+END
+$$
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;

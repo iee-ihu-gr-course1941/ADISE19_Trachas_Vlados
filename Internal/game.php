@@ -2,7 +2,7 @@
 
 function get_card_down(){
 	require_once "dbconnect2.php";
-	$sql = "SELECT last_played From gamestatus Where last_changed=(Select MAX(last_changed) From gamestatus)";
+	$sql = "SELECT last_played From gamestatus Where s_id='0'";
 	$result = $mysqli->query($sql);
 	$row = $result->fetch_assoc();
 		
@@ -76,19 +76,7 @@ function draw_card($username){
 
 function deck_ended(){
 	require_once "dbconnect2.php";
-	$sql = mysqli_query($mysqli,"SELECT deck_counter FROM gamestatus Where last_changed=(Select MAX(last_changed) From gamestatus)");
-	while ($row = mysqli_fetch_assoc($sql)) {
-		$dc = $row['deck_counter'];
-	}
-	$last = mysqli_query($mysqli,"SELECT last_played From gamestatus Where last_changed=(Select MAX(last_changed) From gamestatus)");
-	while ($l = mysqli_fetch_assoc($last)) {
-        $last_played = $l['last_played'];
-    }
-    echo json_encode($last_played);
-    $down =  mysqli_query($mysqli,"SELECT card_id From deck Where card_status='down'");
-    while ($d = mysqli_fetch_assoc($down)) {
-    	$down_cards = $d['card_id'];
-    }
+	
 }
 
 function start_game(){
@@ -143,7 +131,7 @@ function play($username,$card){
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
 			
-			$status_update = "INSERT INTO gamestatus VALUES('0','1','$card',null,'$user1','$user2')";
+			$status_update = "UPDATE gamestatus SET current_player='1', last_played='$card' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}elseif ($username === $r['user2']) {
@@ -154,7 +142,7 @@ function play($username,$card){
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
 			
-			$status_update = "INSERT INTO gamestatus VALUES('0','2','$card',null,'$user1','$user2')";
+			$status_update = "UPDATE gamestatus SET current_player='2', last_played='$card' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}
@@ -217,5 +205,7 @@ function opponent_hand($username){
 	}
 	$counter = count($cards_id);
 	echo json_encode($counter);
+
+	$mysqli->close();
 }
 ?>
