@@ -169,11 +169,11 @@ function login($username){
 		if ( empty($r['user1']) ){
 			$inu1 = "UPDATE gamestatus SET user1='$username' WHERE s_id ='0'";
 			$mysqli->query($inu1);
-			echo "$username is user1";
+			echo json_encode("user1");
 		}elseif (empty($r['user2'])){
 			$inu2 = "UPDATE gamestatus SET user2='$username' WHERE s_id='0'";
 			$mysqli->query($inu2);
-			echo "$username is user2";
+			echo json_encode("user2");
 		}else{
 			echo "User slots are full";
 		}
