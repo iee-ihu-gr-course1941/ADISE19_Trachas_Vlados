@@ -1,4 +1,9 @@
 var opponent_username='traxas';
+var user='';
+var my_user='';
+var last_update=new Date().getTime();
+var game_status="";
+var timer=null;
 
 $(function()
 {
@@ -13,20 +18,27 @@ function login_to_game()
 		alert('You have to set a username');
 		return;
 	}
-	start_game();
+	user=document.getElementById("username").value;
+	document.getElementById("username").remove();
+	document.getElementById("game_login").remove();
+	$.ajax({url: "Internal/API.php/login/"+user, success: start_game });
 }
 
-
-function start_game()
+function start_game(data)
 {
+	dat=JSON.parse(data);
+	my_user.turn=dat;
+	if(my_user=='user2')
+	{
+		$.ajax({url: "Internal/API.php/start_game", method: 'POST', success: draw_starting_hand });
+	}
 	give_turn();
-	$.ajax({url: "Internal/API.php/start_game", method: 'PUT', success: draw_starting_hand });
 }
 
 function draw_starting_hand()
 {
-	$.ajax({url: "Internal/API.php/hand/vlado", success: draw_cards});
-	check_enemy_hand();
+	$.ajax({url: "Internal/API.php/hand/"+user, success: draw_cards});
+	check_opponent_hand();
 }
 function draw_cards(data)//trabaei tis prwtes kartes
 {
@@ -38,14 +50,34 @@ function draw_cards(data)//trabaei tis prwtes kartes
 	get_turn();
 }
 
+function update_status(data)
+{
+	last_update=new Date().getTime();
+	var game_stat_old = game_status;
+	cealTimeout(timer);
+	if(game_status.p_turn==my_user)
+	{
+		if(game_stat_old.p_turn!=game_status.p_turn)
+		{
+
+		}
+	}else
+	{
+		give_turn();
+		timer=setTimeout(function() { game_status_update();}, 4000);
+	}
+}
+
+
 function draw_card()
 {
 	document.getElementById('draw_button').disabled = true;
-	$.ajax({url: "Internal/API.php/draw/vlado", success: print_card});
+	$.ajax({url: "Internal/API.php/draw/" + user, success: print_card});
 }
 
 function print_card(data,place)//place = hand_card OR place = board_card
 {
+	console.log(data);
 	place = typeof a !== 'undefined' ? a : "hand_card";
 	new_card=JSON.parse(data);
 	card_id=new_card["card_id"];
@@ -69,15 +101,20 @@ function print_card(data,place)//place = hand_card OR place = board_card
 
 
 
+function try_play_card(card_id)
+{
+
+	//elegxos poianou guros einai, an mporeis na paiksei tin karta
+	$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id,
+				 method: "PUT",
+				 /*
+				 dataType: "json",
+				 data: JSON.stringify({username: user, card: card_id}),
+				 */
+				 success: play_card});
+}
 function play_card(card_id)
 {
-	//elegxos poianou guros einai, an mporeis na paiksei tin karta
-	remove_card_from_hand(card_id);
-}
-
-function remove_card_from_hand(card_id)
-{
-	//allagi kartas sto board
 	document.getElementById(card_id).remove();
 }
 
@@ -93,14 +130,14 @@ function give_turn()
 	document.getElementById('pass_button').disabled=true;
 }
 
-function check_enemy_hand()
+function check_opponent_hand()
 {
-	$.ajax({url: "Internal/API.php/hand/".concat(opponent_username), success: update_enemy_hand});
+	$.ajax({url: "Internal/API.php/hand/"+opponent_username , success: update_enemy_hand});
 }
-function update_enemy_hand(data)
+function update_opponent_hand(data)
 {
-	cards=JSON.parse(data);
-	document.getElementById('opponent_cards').innerHTML= cards.length;
+	//cards=JSON.parse(data);
+	//document.getElementById('opponent_cards').innerHTML= cards;
 }
 
 
