@@ -175,12 +175,47 @@ function login($username){
 			$mysqli->query($inu2);
 			echo json_encode("user2");
 		}else{
-			echo "User slots are full";
+			header("HTTP/1.1 400 No More Users Allowed");
+			echo json_encode("Error 400 No More Users Allowed");
 		}
 	}
 	$mysqli->close();
 }
 
+function end_game(){
+	require_once "dbconnect2.php";
 
+	$deleteDeck = "TRUNCATE deck";
+	$mysqli->query($deleteDeck);
 
+	$deleteStatus = "DELETE FROM gamestatus WHERE s_id!='0'";
+	$mysqli->query($deleteStatus);
+
+	$resetStatus = "UPDATE gamestatus SET current_player='0', last_played='0', user1='', user2='' WHERE s_id='0'";
+	$mysqli->query($resetStatus);
+
+	$mysqli->close();
+}
+
+function opponent_hand($username){
+	require_once "dbconnect2.php";
+
+	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
+	$cards_id = array();
+	while ($r = mysqli_fetch_assoc($users)) {
+		if ($username === $r['user1']) {
+			$sql = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='user2'");
+			while($row = mysqli_fetch_assoc($sql)) {
+        		$cards_id[] = $row['card_id'];
+    		}
+		}elseif ($username === $r['user2']) {
+			$sql = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='user1'");
+			while($row = mysqli_fetch_assoc($sql)) {
+        		$cards_id[] = $row['card_id'];
+    		}
+		}
+	}
+	$counter = count($cards_id);
+	echo json_encode($counter);
+}
 ?>
