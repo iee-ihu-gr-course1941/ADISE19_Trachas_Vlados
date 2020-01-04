@@ -12,11 +12,14 @@ switch ($r=array_shift($request)) {
 	
 	case 'draw' : handle_draw($method,$request[0]);break;//to request einai to poios user einai
 
-	case 'start_game' : handle_start($method,$request[0],$request[1]);break;
+	case 'start_game' : handle_start($method);break;
 
 	case 'play_card' : handle_play($method,$request[0],$request[1]);break;
 
 	case 'deck_ended' : handle_end($method);break;
+
+	case 'login' : handle_login($method,$request[0]);break;
+
 
 	default: header("HTTP/1.1 404 Not Fount");break;
 }
@@ -44,9 +47,9 @@ function handle_draw($method,$username){
 		header("HTTP/1.1 404 Wrong End");
 	}
 }
-function handle_start($method,$user1,$user2){
+function handle_start($method){
 	if ($method === 'POST') {
-		start_game($user1,$user2);
+		start_game();
 	}else{
 		header("HTTP/1.1 404 Wrong End");
 	}
@@ -63,6 +66,14 @@ function handle_play($method,$username,$card){
 function handle_end($method){
 	if ($method === 'GET') {
 		deck_ended();
+	}else{
+		header("HTTP/1.1 404 Wrong End");
+	}
+}
+
+function handle_login($method,$username){
+	if ($method === 'GET') {
+		login($username);
 	}else{
 		header("HTTP/1.1 404 Wrong End");
 	}

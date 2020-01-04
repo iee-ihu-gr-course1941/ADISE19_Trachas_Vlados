@@ -14,20 +14,27 @@ function get_card_down(){
 
 function get_players_hand($username){
 	require_once "dbconnect2.php";
+	require_once 'deck.php';
 	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
-	$cards = array();
+	$cards_id = array();
 	while ($r = mysqli_fetch_assoc($users)) {
 		if ($username === $r['user1']) {
 			$sql = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='user1'");
 			while($row = mysqli_fetch_assoc($sql)) {
-        		$cards[] = $row['card_id'];
+        		$cards_id[] = $row['card_id'];
     		}
 		}elseif ($username === $r['user2']) {
 			$sql = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='user2'");
 			while($row = mysqli_fetch_assoc($sql)) {
-        		$cards[] = $row['card_id'];
+        		$cards_id[] = $row['card_id'];
     		}
 		}
+	}
+	$counter = count($cards_id);
+	$cards = array();
+	for ($i=0; $i < $counter; $i++) { 
+		$card_id = $cards_id[$i];
+		$cards[$i] = $deck[$card_id];
 	}
 	echo json_encode($cards);
 	$mysqli->close();	
@@ -84,7 +91,7 @@ function deck_ended(){
     }
 }
 
-function start_game($user1,$user2){
+function start_game(){
 	require_once "dbconnect2.php";
 	require_once 'deck.php';
 	$numbers=range(0,107);
@@ -119,11 +126,9 @@ function start_game($user1,$user2){
     	$down_card = $d['card_id'];
     }
 
-    $deleteS = "TRUNCATE gamestatus";
-	$mysqli->query($deleteS);
-
-    $status = "INSERT INTO gamestatus Values('0','1','$down_card',null,'$user1','$user2')";
+    $status = "UPDATE gamestatus SET last_played = '$down_card' WHERE s_id='1'";
 	$mysqli->query($status);
+	$mysqli->close();
 }
 
 function play($username,$card){
@@ -154,6 +159,28 @@ function play($username,$card){
 			
 		}
 	}
+	$mysqli->close();
 }
+
+function login($username){
+	require_once "dbconnect2.php";
+	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
+	while ($r = mysqli_fetch_assoc($users)) {
+		if ( empty($r['user1']) ){
+			$inu1 = "UPDATE gamestatus SET user1='$username' WHERE s_id ='1'";
+			$mysqli->query($inu1);
+			echo "$username is user1";
+		}elseif (empty($r['user2'])){
+			$inu2 = "UPDATE gamestatus SET user2='$username' WHERE s_id='1'";
+			$mysqli->query($inu2);
+			echo "$username is user2";
+		}else{
+			echo "User slots are full";
+		}
+	}
+	$mysqli->close();
+}
+
+
 
 ?>
