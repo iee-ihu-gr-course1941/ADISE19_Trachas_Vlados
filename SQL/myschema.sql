@@ -72,7 +72,7 @@ DELIMITER ;
 --
 -- 
 --
-
+INSERT INTO GameStatus VALUES(0,0,0,NULL,'','');
 --
 -- 
 --

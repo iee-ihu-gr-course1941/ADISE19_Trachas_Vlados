@@ -167,11 +167,11 @@ function login($username){
 	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
 	while ($r = mysqli_fetch_assoc($users)) {
 		if ( empty($r['user1']) ){
-			$inu1 = "UPDATE gamestatus SET user1='$username' WHERE s_id ='1'";
+			$inu1 = "UPDATE gamestatus SET user1='$username' WHERE s_id ='0'";
 			$mysqli->query($inu1);
 			echo "$username is user1";
 		}elseif (empty($r['user2'])){
-			$inu2 = "UPDATE gamestatus SET user2='$username' WHERE s_id='1'";
+			$inu2 = "UPDATE gamestatus SET user2='$username' WHERE s_id='0'";
 			$mysqli->query($inu2);
 			echo "$username is user2";
 		}else{
