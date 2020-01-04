@@ -126,7 +126,7 @@ function start_game(){
     	$down_card = $d['card_id'];
     }
 
-    $status = "UPDATE gamestatus SET last_played = '$down_card' WHERE s_id='1'";
+    $status = "UPDATE gamestatus SET last_played = '$down_card' WHERE s_id='0'";
 	$mysqli->query($status);
 	$mysqli->close();
 }
