@@ -10,12 +10,12 @@
     <title>Uno Card Game</title>
 
     <!-- calls -->
-    <link href="css/myUno.css?t=125" type="text/css" rel="stylesheet">
+    <link href="css/myUno.css?t=122" type="text/css" rel="stylesheet">
     <script src="bootstrap/jquery-3.2.1.min.js"></script>
     <script src="bootstrap/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/myuno.js?t=123"></script>
+    <script type="text/javascript" src="js/myuno.js?t=120"></script>
   </head>
-<body style="background-color:#ff751a;" onload="start_game()">
+<body style="background-color:#ff751a;">
 
 <div id='opponent_hand'>
 
