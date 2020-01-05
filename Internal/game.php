@@ -76,6 +76,67 @@ function draw_card($username){
 
 function deck_ended(){
 	require_once "dbconnect2.php";
+	require_once 'deck.php';
+
+	$sql = "SELECT last_played From gamestatus Where s_id='0'";
+	$result = $mysqli->query($sql);
+	$row = $result->fetch_assoc();
+	$c_id = $row['last_played'];
+
+	$cards_id = array();
+	$down = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='down'");
+	while ($d = mysqli_fetch_assoc($down)){
+		if ($d['card_id']!= $c_id) {
+			$cards_id[]= $d['card_id'];
+		}
+	}
+
+	$h1 = array();
+   	$hand1 = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='user1'");
+	while($row = mysqli_fetch_assoc($hand1)) {
+        $h1[] = $row['card_id'];
+    }
+
+    $h2 = array();
+    $hand2 = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='user2'");
+	while($row = mysqli_fetch_assoc($hand2)) {
+        $h2[] = $row['card_id'];
+    }
+
+   	$deleteDeck = "TRUNCATE deck";
+	$mysqli->query($deleteDeck);
+
+	$first = "INSERT INTO deck Values('$c_id','down','0')";
+    $mysqli->query($first);
+	
+    $count1 = count($h1);
+    $count2 = count($h2);
+    $a = $count1+$count2;
+    $b = count($cards_id);
+
+    $c=0;
+    for ($i=1; $i < $count1+1 ; $i++) { 
+    	$d1 = "INSERT INTO deck Values('$h1[$c]','user1','$i')";
+   		$mysqli->query($d1);
+   		$c++;
+    }
+
+   	$c=0;
+    for ($i=$count1+1; $i < $a+1 ; $i++) { 
+    	$d2 = "INSERT INTO deck Values('$h2[$c]','user2','$i')";
+   		$mysqli->query($d2);
+   		$c++;
+    }
+    $c=0;
+    shuffle($cards_id);
+    for ($i=$a+1; $i < 108 ; $i++) { 
+    	$dd = "INSERT INTO deck Values('$cards_id[$c]','deck','$i')";
+   		$mysqli->query($dd);
+   		$c++;
+    }
+    
+    
+    $mysqli->close();
 	
 }
 
@@ -104,7 +165,6 @@ function start_game(){
     }
     
     for ($i=8; $i <15 ; $i++) { 
-    	
     	$h2 = "UPDATE deck Set card_status='user2' Where deck_position='$i'";
     	$mysqli->query($h2);
     }
@@ -116,6 +176,7 @@ function start_game(){
 
     $status = "UPDATE gamestatus SET last_played = '$down_card' WHERE s_id='0'";
 	$mysqli->query($status);
+
 	$mysqli->close();
 }
 
@@ -175,9 +236,6 @@ function end_game(){
 
 	$deleteDeck = "TRUNCATE deck";
 	$mysqli->query($deleteDeck);
-
-	$deleteStatus = "DELETE FROM gamestatus WHERE s_id!='0'";
-	$mysqli->query($deleteStatus);
 
 	$resetStatus = "UPDATE gamestatus SET current_player='0', last_played='0', user1='', user2='' WHERE s_id='0'";
 	$mysqli->query($resetStatus);

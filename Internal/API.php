@@ -16,7 +16,7 @@ switch ($r=array_shift($request)) {
 
 	case 'play_card' : handle_play($method,$request[0],$request[1]);break;
 
-	case 'deck_ended' : handle_end($method);break;
+	case 'deck_ended' : handle_deck_end($method);break;
 
 	case 'login' : handle_login($method,$request[0]);break;
 
@@ -59,15 +59,15 @@ function handle_start($method){
 }
 
 function handle_play($method,$username,$card){
-	if ($method === 'PUT'){
+	if ($method === 'POST'){
 		play($username,$card);
 	}else{
 		header("HTTP/1.1 404 Wrong End");
 	}
 }
 
-function handle_end($method){
-	if ($method === 'GET') {
+function handle_deck_end($method){
+	if ($method === 'POST') {
 		deck_ended();
 	}else{
 		header("HTTP/1.1 404 Wrong End");
