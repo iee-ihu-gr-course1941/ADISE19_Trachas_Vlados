@@ -1,15 +1,16 @@
-var opponent_username='traxas';
-var user='';
-var my_user='';
+var opponent_username='';//username of opponent client
+var user='';//username of client
+var my_user='';//usser1 or user2
 var last_update=new Date().getTime();
-var game_status="";
+var turn="";
+var can_play=false;
 var timer=null;
 
 $(function()
 {
 	$('#game_login').click( login_to_game);
 	$('#draw_button').click( draw_card);
-	$('#pass_button').click( give_turn);
+	$('#pass_button').click( win_game);//NA TO ALLAKSW
 });
 
 function login_to_game()
@@ -27,7 +28,8 @@ function login_to_game()
 function start_game(data)
 {
 	dat=JSON.parse(data);
-	my_user.turn=dat;
+	my_user=dat;
+	turn=2;
 	if(my_user=='user2')
 	{
 		$.ajax({url: "Internal/API.php/start_game", method: 'POST', success: draw_starting_hand });
@@ -39,6 +41,7 @@ function draw_starting_hand()
 {
 	$.ajax({url: "Internal/API.php/hand/"+user, success: draw_cards});
 	check_opponent_hand();
+	$.ajax({url: "Internal/API.php/card_down", success : print_down_card});
 }
 function draw_cards(data)//trabaei tis prwtes kartes
 {
@@ -50,18 +53,29 @@ function draw_cards(data)//trabaei tis prwtes kartes
 	get_turn();
 }
 
+function game_status_update()
+{
+	clearTimeout(timer);
+	//ajax
+}
 function update_status(data)
 {
 	last_update=new Date().getTime();
-	var game_stat_old = game_status;
+	var old_turn = turn;
+	t=JSON.parse(data);
+	turn=t[0];
 	cealTimeout(timer);
-	if(game_status.p_turn==my_user)
+	if((my_user=="user1" && turn == 1) || (my_user=="user2" && turn == 2))
 	{
-		if(game_stat_old.p_turn!=game_status.p_turn)
+		if(old_turn != turn)
 		{
-
+			$.ajax({url: "Internal/API.php/card_down", success : print_down_card});
+			check_opponent_hand();
 		}
-	}else
+		get_turn();
+		timer=setTimeout(function() { game_status_update();}, 15000)
+	}
+	else
 	{
 		give_turn();
 		timer=setTimeout(function() { game_status_update();}, 4000);
@@ -72,18 +86,29 @@ function update_status(data)
 function draw_card()
 {
 	document.getElementById('draw_button').disabled = true;
-	$.ajax({url: "Internal/API.php/draw/" + user, success: print_card});
+	$.ajax({url: "Internal/API.php/draw/" + user, success: print_drawn_card});
 }
 
-function print_card(data,place)//place = hand_card OR place = board_card
+function print_drawn_card(data)
+{
+	new_card=JSON.parse(data);
+	print_card(new_card);
+}
+
+function print_down_card(data)
 {
 	console.log(data);
+	//new_card=JSON.parse(data);
+	//print_card(new_card,"board_card");
+}
+
+function print_card(new_card,place)//place = hand_card OR place = board_card
+{
 	place = typeof a !== 'undefined' ? a : "hand_card";
-	new_card=JSON.parse(data);
 	card_id=new_card["card_id"];
 	card_number=new_card["number"];
 	card_color=new_card["color"];	
-
+	
 	var card = document.createElement("div");
 	card.classList.add(place);
 	card.setAttribute("id", card_id);
@@ -91,7 +116,7 @@ function print_card(data,place)//place = hand_card OR place = board_card
 	card.innerHTML=card_number;
 	if (place == "hand_card") 
 	{
-		card.setAttribute("onclick", "play_card(this.id)");
+		card.setAttribute("onclick", "try_play_card(this.id)");
 		document.getElementById('hand').appendChild(card);
 	}else if(place == "board_card")
 	{
@@ -103,15 +128,13 @@ function print_card(data,place)//place = hand_card OR place = board_card
 
 function try_play_card(card_id)
 {
-
-	//elegxos poianou guros einai, an mporeis na paiksei tin karta
-	$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id,
+	if(can_play)
+	{
+		$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id,
 				 method: "PUT",
-				 /*
-				 dataType: "json",
-				 data: JSON.stringify({username: user, card: card_id}),
-				 */
-				 success: play_card});
+				 success: play_card(card_id)});
+	}
+	
 }
 function play_card(card_id)
 {
@@ -120,28 +143,36 @@ function play_card(card_id)
 
 function get_turn()
 {
+	can_play=true;
 	document.getElementById('draw_button').disabled=false;
 	document.getElementById('pass_button').disabled=false;
 }
 
 function give_turn()
 {
+	can_play=false;
 	document.getElementById('draw_button').disabled=true;
 	document.getElementById('pass_button').disabled=true;
 }
 
 function check_opponent_hand()
 {
-	$.ajax({url: "Internal/API.php/hand/"+opponent_username , success: update_enemy_hand});
+	$.ajax({url: "Internal/API.php/opponent_hand/"+user , success: update_opponent_hand});
 }
 function update_opponent_hand(data)
 {
-	//cards=JSON.parse(data);
-	//document.getElementById('opponent_cards').innerHTML= cards;
+	cards=JSON.parse(data);
+	document.getElementById('opponent_cards').innerHTML= cards;
 }
 
 
+
+//end of game
 function win_game()
 {
-
+	$.ajax({url: "Internal/API.php/end_game", success: refresh_page});
+}
+function refresh_page()
+{
+	location.reload();
 }
