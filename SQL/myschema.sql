@@ -43,6 +43,7 @@ CREATE TABLE `GameStatus` (
   `s_id` int(11) NOT NULL AUTO_INCREMENT,
   `current_player` int(11) NOT NULL,
   `last_played` int(11) NOT NULL,
+  `played_by` int(11) NOT NULL,
   `last_changed` timestamp NULL DEFAULT NULL,
   `user1` varchar(250) NULL,
   `user2` varchar(250) NULL,
@@ -71,7 +72,7 @@ DELIMITER ;
 --
 -- 
 --
-INSERT INTO GameStatus VALUES(0,0,0,NULL,'','');
+INSERT INTO GameStatus VALUES(0,0,0,0,NULL,'','');
 --
 -- 
 --
