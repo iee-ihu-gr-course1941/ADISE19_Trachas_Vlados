@@ -24,6 +24,8 @@ switch ($r=array_shift($request)) {
 
 	case 'opponent_hand' : handle_opponent_hand($method,$request[0]);break;
 
+	case 'player_turn' : handle_get_player_turn($method);break;
+
 	default: header("HTTP/1.1 404 Not Fount");break;
 }
 
@@ -93,6 +95,14 @@ function handle_endgame($method){
 function handle_opponent_hand($method,$username){
 	if ($method === 'GET') {
 		opponent_hand($username);
+	}else{
+		header("HTTP/1.1 404 Wrong End");
+	}
+}
+
+function handle_get_player_turn($method){
+	if ($method === 'GET') {
+		get_turn();
 	}else{
 		header("HTTP/1.1 404 Wrong End");
 	}

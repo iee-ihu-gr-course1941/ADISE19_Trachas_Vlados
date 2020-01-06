@@ -1,3 +1,0 @@
-get_card_down na epistrefei id, xrwma kai numero.
-me to pou arxizei to paixnidi to current_player sto gamestatus na ginei 2.
-API pou epistrefei poianou guros einai.

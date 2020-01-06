@@ -2,12 +2,12 @@
 
 function get_card_down(){
 	require_once "dbconnect2.php";
+	require_once 'deck.php';
 	$sql = "SELECT last_played From gamestatus Where s_id='0'";
 	$result = $mysqli->query($sql);
 	$row = $result->fetch_assoc();
-		
-	$data = ['top_card' => $row['last_played']];
-	header('Content-type: application/json');
+	$id = $row['last_played'];
+	$data = $deck[$id];
 	echo json_encode( $data );
 	$mysqli->close();
 }
@@ -174,7 +174,7 @@ function start_game(){
     	$down_card = $d['card_id'];
     }
 
-    $status = "UPDATE gamestatus SET last_played = '$down_card' WHERE s_id='0'";
+    $status = "UPDATE gamestatus SET last_played = '$down_card', current_player='2' WHERE s_id='0'";
 	$mysqli->query($status);
 
 	$mysqli->close();
@@ -192,7 +192,7 @@ function play($username,$card){
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
 			
-			$status_update = "UPDATE gamestatus SET current_player='1', last_played='$card' WHERE s_id='0'";
+			$status_update = "UPDATE gamestatus SET played_by='1', last_played='$card' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}elseif ($username === $r['user2']) {
@@ -203,7 +203,7 @@ function play($username,$card){
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
 			
-			$status_update = "UPDATE gamestatus SET current_player='2', last_played='$card' WHERE s_id='0'";
+			$status_update = "UPDATE gamestatus SET played_by='2', last_played='$card' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}
@@ -237,7 +237,7 @@ function end_game(){
 	$deleteDeck = "TRUNCATE deck";
 	$mysqli->query($deleteDeck);
 
-	$resetStatus = "UPDATE gamestatus SET current_player='0', last_played='0', user1='', user2='' WHERE s_id='0'";
+	$resetStatus = "UPDATE gamestatus SET current_player='0', last_played='0', played_by='0', user1='', user2='' WHERE s_id='0'";
 	$mysqli->query($resetStatus);
 
 	$mysqli->close();
@@ -264,6 +264,16 @@ function opponent_hand($username){
 	$counter = count($cards_id);
 	echo json_encode($counter);
 
+	$mysqli->close();
+}
+
+function get_turn(){
+	require_once "dbconnect2.php";
+	$sql = "SELECT current_player From gamestatus Where s_id='0'";
+	$result = $mysqli->query($sql);
+	$row = $result->fetch_assoc();
+	$data = $row['current_player'];
+	echo json_encode( $data );
 	$mysqli->close();
 }
 ?>
