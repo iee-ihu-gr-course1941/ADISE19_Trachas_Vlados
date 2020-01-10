@@ -88,6 +88,9 @@
 	width:150px;
 	height:200px;
 }
+.hand_card:hover{
+	font-size: 100px;
+}
 
 /*buttons*/
 .buttons{

@@ -1,16 +1,18 @@
-var opponent_username='';//username of opponent client
 var user='';//username of client
-var my_user='';//usser1 or user2
+var my_user='';//user1 or user2
 var last_update=new Date().getTime();
-var turn="";
-var can_play=false;
+var turn="";//var to see whom turn is now
+var can_play=false; //bool to see if client can play
 var timer=null;
+var opponent_cards=7;
+var user_cards=7;
 
 $(function()
 {
 	$('#game_login').click( login_to_game);
 	$('#draw_button').click( draw_card);
-	$('#pass_button').click( win_game);//NA TO ALLAKSW
+	game_status_update();
+	$('#pass_button').click( pass_turn);
 });
 
 function login_to_game()
@@ -18,11 +20,15 @@ function login_to_game()
 	if($('#username').val()=='') {
 		alert('You have to set a username');
 		return;
+	}else if($('#username').val()=='RESTART')//an sto username balei "RESTART" teleiwnei to paixnidi kai kanei restart tin basi
+	{
+		alert('RESTARTING');
+		$.ajax({url: "Internal/API.php/end_game",method: "POST", success: refresh_page});
 	}
 	user=document.getElementById("username").value;
 	document.getElementById("username").remove();
 	document.getElementById("game_login").remove();
-	$.ajax({url: "Internal/API.php/login/"+user, success: start_game });
+	$.ajax({url: "Internal/API.php/register/"+user, method: "POST",  success: start_game });
 }
 
 function start_game(data)
@@ -32,79 +38,93 @@ function start_game(data)
 	turn=2;
 	if(my_user=='user2')
 	{
-		$.ajax({url: "Internal/API.php/start_game", method: 'POST', success: draw_starting_hand });
+		$.ajax({url: "Internal/API.php/start_game", method: 'POST', success: refresh_hand_and_board });
 	}
 	give_turn();
 }
 
-function draw_starting_hand()
+function refresh_hand_and_board()//methodos pou kanei refresh to UI tou xeriou kai tis kartas pou einai katw
 {
+	var hand = document.getElementById('hand');
+	while(hand.hasChildNodes())
+	{
+		hand.removeChild(hand.firstChild);
+	}
 	$.ajax({url: "Internal/API.php/hand/"+user, success: draw_cards});
-	check_opponent_hand();
 	$.ajax({url: "Internal/API.php/card_down", success : print_down_card});
 }
-function draw_cards(data)//trabaei tis prwtes kartes
+function draw_cards(data)//trabaei tis kartes pou krataei
 {
 	h_cards=JSON.parse(data);
-	for(var i=0;i<h_cards.length;i++)
+	user_cards=h_cards.length;
+	for(var i=0;i<user_cards;i++)
 	{
 		print_card(h_cards[i]);
 	}
-	get_turn();
 }
 
 function game_status_update()
 {
 	clearTimeout(timer);
-	//ajax
+	$.ajax({url: "Internal/API.php/get_turn", success: update_status });
 }
-function update_status(data)
+function update_status(data)//update listener
 {
+
 	last_update=new Date().getTime();
 	var old_turn = turn;
 	t=JSON.parse(data);
-	turn=t[0];
-	cealTimeout(timer);
-	if((my_user=="user1" && turn == 1) || (my_user=="user2" && turn == 2))
+	turn=t;
+	clearTimeout(timer);
+
+	if(turn==0)
 	{
+		timer=setTimeout(function() { game_status_update();}, 6000);
+	}else if((my_user=="user1" && turn == 1) || (my_user=="user2" && turn == 2))
+	{//an einai o guros tou kanei ta parakatw
+		if(!can_play)
+		{
+			get_turn();
+		}
 		if(old_turn != turn)
 		{
-			$.ajax({url: "Internal/API.php/card_down", success : print_down_card});
-			check_opponent_hand();
+			refresh_hand_and_board();
 		}
-		get_turn();
-		timer=setTimeout(function() { game_status_update();}, 15000)
+		check_opponent_hand();
+		timer=setTimeout(function() { game_status_update();}, 2000)
 	}
-	else
-	{
-		give_turn();
-		timer=setTimeout(function() { game_status_update();}, 4000);
+	else if((my_user=="user1" && turn == 2) || (my_user=="user2" && turn == 1))
+	{//perimenei na paiksei
+		refresh_hand_and_board();
+		check_opponent_hand();
+		timer=setTimeout(function() { game_status_update();}, 2000);
 	}
 }
 
 
-function draw_card()
+function draw_card()//trabaei mia karta
 {
+	user_cards++;
 	document.getElementById('draw_button').disabled = true;
 	$.ajax({url: "Internal/API.php/draw/" + user, success: print_drawn_card});
 }
 
-function print_drawn_card(data)
+function print_drawn_card(data)//emfanizei karta sto UI tou xeriou
 {
 	new_card=JSON.parse(data);
 	print_card(new_card);
 }
 
-function print_down_card(data)
+function print_down_card(data)//emfanizei tin karta pou paixtike sto UI
 {
-	console.log(data);
-	//new_card=JSON.parse(data);
-	//print_card(new_card,"board_card");
+	new_card=JSON.parse(data);
+	print_card(new_card,"board_card");
 }
 
-function print_card(new_card,place)//place = hand_card OR place = board_card
+function print_card(new_card,place)//methodos gia tin emfanisi kartwn
 {
-	place = typeof a !== 'undefined' ? a : "hand_card";
+	place = typeof place !== 'undefined' ? place : "hand_card";
+	//place = hand_card OR place = board_card
 	card_id=new_card["card_id"];
 	card_number=new_card["number"];
 	card_color=new_card["color"];	
@@ -124,53 +144,73 @@ function print_card(new_card,place)//place = hand_card OR place = board_card
 	}
 }
 
+function pass_turn()//methodos gia na dwsei ton guro tou ston antipalo
+{
+	$.ajax({url: "Internal/API.php/set_turn/pass" ,method: 'POST'})
+	give_turn();
+}
 
 
 function try_play_card(card_id)
 {
 	if(can_play)
 	{
-		$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id,
-				 method: "PUT",
-				 success: play_card(card_id)});
+		$.ajax({url: "Internal/API.php/set_turn/"+card_id ,method: 'POST'})
+		$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id, method: "PUT", success: play_card(card_id)});
 	}
 	
 }
 function play_card(card_id)
 {
+	var this_card = {};
+	this_card["card_id"]=card_id;
+	this_card["color"]=document.getElementById(card_id).style.background;
+	this_card["number"]=document.getElementById(card_id).innerHTML;
 	document.getElementById(card_id).remove();
+	print_card(this_card, "board_card");
+	user_cards--;
+	if(user_cards==0){win_game();}
+	give_turn();
 }
 
-function get_turn()
+function get_turn()//energopoiei ta koumpia otan arxizei o guros tou client
 {
 	can_play=true;
 	document.getElementById('draw_button').disabled=false;
 	document.getElementById('pass_button').disabled=false;
 }
 
-function give_turn()
+function give_turn()//apenergopoiei ta koumpia otan teleiwnei o guros tou client
 {
 	can_play=false;
 	document.getElementById('draw_button').disabled=true;
 	document.getElementById('pass_button').disabled=true;
 }
 
-function check_opponent_hand()
+function check_opponent_hand()//methodos gia na brei poses kartes exei o antipalos
 {
 	$.ajax({url: "Internal/API.php/opponent_hand/"+user , success: update_opponent_hand});
 }
-function update_opponent_hand(data)
+function update_opponent_hand(data)//methodos gia na allaksei ton arithmo kartwn tou antipalou
 {
 	cards=JSON.parse(data);
+	opponent_cards = cards;
 	document.getElementById('opponent_cards').innerHTML= cards;
+	if(opponent_cards==0 && user_cards>0) {lose_game();}//an o antipalos exei 0 kartes sto xeri xanei o client
 }
 
 
 
 //end of game
+function lose_game()
+{
+	alert("YOU LOSE");
+	$.ajax({url: "Internal/API.php/end_game",method: "POST", success: refresh_page});
+}
 function win_game()
 {
-	$.ajax({url: "Internal/API.php/end_game", success: refresh_page});
+	alert("YOU ARE THE WINNER");
+	refresh_page();
 }
 function refresh_page()
 {
