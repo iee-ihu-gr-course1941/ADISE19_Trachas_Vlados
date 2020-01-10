@@ -3,9 +3,8 @@
 # Project: UNO card game
 
 
+# API:
 
-API:
-  Cases:
 /card_down/ ,GET, Επιστρέφει σε json, μέσω του πίνακα gamestatus, την τελευταία κάρτα που παίχτηκε και βρίσκεται κάτω στο board.
 
 /hand/{p} , GET, Επιστρέφει σε json τα id των καρτών που έχει στο χέρι του ο παίκτης(p). Το p παίρνει ως τιμή το username που έδωσε ο χρήστης.
