@@ -18,7 +18,7 @@ switch ($r=array_shift($request)) {
 
 	case 'deck_ended' : handle_deck_end($method);break;
 
-	case 'login' : handle_login($method,$request[0]);break;
+	case 'register' : handle_register($method,$request[0]);break;
 
 	case 'end_game' : handle_endgame($method);break;
 
@@ -78,9 +78,9 @@ function handle_deck_end($method){
 	}
 }
 
-function handle_login($method,$username){
+function handle_register($method,$username){
 	if ($method === 'POST') {
-		login($username);
+		register($username);
 	}else{
 		header("HTTP/1.1 404 Wrong End");
 	}
