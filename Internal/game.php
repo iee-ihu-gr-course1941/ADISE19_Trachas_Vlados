@@ -282,9 +282,7 @@ function set_turn($card){
 	require_once "deck.php";
 	require_once "card.php";
 
-	$number = $deck[$card]->get_number();
-
-	if ($number!='B' AND $number!='R') {
+	if ($card == "pass") {
 		$sql = "SELECT current_player From gamestatus Where s_id='0'";
 		$result = $mysqli->query($sql);
 		$row = $result->fetch_assoc();
@@ -297,6 +295,25 @@ function set_turn($card){
 			$turn = "UPDATE gamestatus SET current_player='2' WHERE s_id='0'";
 			$mysqli->query($turn);
 		}
+	}else{
+		$number = $deck[$card]->get_number();
+
+		if ($number!='B' AND $number!='R') {
+			$sql = "SELECT current_player From gamestatus Where s_id='0'";
+			$result = $mysqli->query($sql);
+			$row = $result->fetch_assoc();
+			$data = $row['current_player'];
+			
+			if($data == "2"){
+				$turn = "UPDATE gamestatus SET current_player='1' WHERE s_id='0'";
+				$mysqli->query($turn);
+			}elseif($data == "1"){
+				$turn = "UPDATE gamestatus SET current_player='2' WHERE s_id='0'";
+				$mysqli->query($turn);
+			}
+		}
 	}
+	
+	$mysqli->close();
 }
 ?>
