@@ -276,4 +276,36 @@ function get_turn(){
 	echo json_encode( $data );
 	$mysqli->close();
 }
+
+function set_turn($card){
+	require_once "dbconnect2.php";
+	if ($card == "B") {
+		$sql = "SELECT current_player From gamestatus Where s_id='0'";
+		$result = $mysqli->query($sql);
+		$row = $result->fetch_assoc();
+		$data = $row['current_player'];
+
+		echo json_encode( $data );
+	}elseif ($card == "R") {
+		$sql = "SELECT current_player From gamestatus Where s_id='0'";
+		$result = $mysqli->query($sql);
+		$row = $result->fetch_assoc();
+		$data = $row['current_player'];
+
+		echo json_encode( $data );
+	}else{
+		$sql = "SELECT current_player From gamestatus Where s_id='0'";
+		$result = $mysqli->query($sql);
+		$row = $result->fetch_assoc();
+		$data = $row['current_player'];
+		
+		if($data == "2"){
+			$turn = "UPDATE gamestatus SET current_player='1' WHERE s_id='0'";
+			$mysqli->query($turn);
+		}elseif($data == "1"){
+			$turn = "UPDATE gamestatus SET current_player='2' WHERE s_id='0'";
+			$mysqli->query($turn);
+		}
+	}
+}
 ?>
