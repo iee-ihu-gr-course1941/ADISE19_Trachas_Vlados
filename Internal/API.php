@@ -79,7 +79,7 @@ function handle_deck_end($method){
 }
 
 function handle_login($method,$username){
-	if ($method === 'PUT') {
+	if ($method === 'POST') {
 		login($username);
 	}else{
 		header("HTTP/1.1 404 Wrong End");
