@@ -79,7 +79,7 @@ function handle_deck_end($method){
 }
 
 function handle_login($method,$username){
-	if ($method === 'GET') {
+	if ($method === 'PUT') {
 		login($username);
 	}else{
 		header("HTTP/1.1 404 Wrong End");
@@ -87,7 +87,7 @@ function handle_login($method,$username){
 }
 
 function handle_endgame($method){
-	if ($method === 'GET') {
+	if ($method === 'POST') {
 		end_game();
 	}else{
 		header("HTTP/1.1 404 Wrong End");
