@@ -279,21 +279,12 @@ function get_turn(){
 
 function set_turn($card){
 	require_once "dbconnect2.php";
-	if ($card == "B") {
-		$sql = "SELECT current_player From gamestatus Where s_id='0'";
-		$result = $mysqli->query($sql);
-		$row = $result->fetch_assoc();
-		$data = $row['current_player'];
+	require_once "deck.php";
+	require_once "card.php";
 
-		echo json_encode( $data );
-	}elseif ($card == "R") {
-		$sql = "SELECT current_player From gamestatus Where s_id='0'";
-		$result = $mysqli->query($sql);
-		$row = $result->fetch_assoc();
-		$data = $row['current_player'];
+	$number = $deck[$card]->get_number();
 
-		echo json_encode( $data );
-	}else{
+	if ($number!='B' AND $number!='R') {
 		$sql = "SELECT current_player From gamestatus Where s_id='0'";
 		$result = $mysqli->query($sql);
 		$row = $result->fetch_assoc();
