@@ -143,6 +143,7 @@ function deck_ended(){
 function start_game(){
 	require_once "dbconnect2.php";
 	require_once 'deck.php';
+	require 'card.php';
 	$numbers=range(0,107);
     shuffle($numbers);
 
@@ -173,7 +174,7 @@ function start_game(){
     while ($d = mysqli_fetch_assoc($down)) {
     	$down_card = $d['card_id'];
     }
-
+    $color = $deck[$down_card]->get_color();
     $status = "UPDATE gamestatus SET last_played = '$down_card', current_player='2' WHERE s_id='0'";
 	$mysqli->query($status);
 
