@@ -45,6 +45,7 @@ CREATE TABLE `GameStatus` (
   `last_played` int(11) NOT NULL,
   `played_by` int(11) NOT NULL,
   `last_changed` timestamp NULL DEFAULT NULL,
+  `current_color` varchar(150) NULL,
   `user1` varchar(250) NULL,
   `user2` varchar(250) NULL,
   PRIMARY KEY (`s_id`)
