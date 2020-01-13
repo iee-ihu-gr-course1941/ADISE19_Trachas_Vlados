@@ -143,7 +143,7 @@ function deck_ended(){
 function start_game(){
 	require_once "dbconnect2.php";
 	require_once 'deck.php';
-	require 'card.php';
+	require_once 'card.php';
 	$numbers=range(0,107);
     shuffle($numbers);
 
@@ -152,8 +152,8 @@ function start_game(){
 
     for ($i=1; $i < 108 ; $i++) { 
     	$position = $numbers[$i];
-    	$deck = "INSERT INTO deck Values('$i','deck','$position')";
-    	$mysqli->query($deck);
+    	$deck_s = "INSERT INTO deck Values('$i','deck','$position')";
+    	$mysqli->query($deck_s);
     }
     
     $first = "UPDATE deck Set card_status='down' Where deck_position='0'";
@@ -175,36 +175,38 @@ function start_game(){
     	$down_card = $d['card_id'];
     }
     $color = $deck[$down_card]->get_color();
-    $status = "UPDATE gamestatus SET last_played = '$down_card', current_player='2' WHERE s_id='0'";
+    $status = "UPDATE gamestatus SET last_played = '$down_card', current_color='$color', current_player='2' WHERE s_id='0'";
 	$mysqli->query($status);
 
 	$mysqli->close();
 }
 
-function play($username,$card){
+function play($username,$card_p){
 	require_once "dbconnect2.php";
+	require_once 'deck.php';
+	require_once 'card.php';
 	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
 	while ($r = mysqli_fetch_assoc($users)) {
 		if ($username === $r['user1']) {
 			
-			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card";
+			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card_p";
 			$mysqli->query($play);
 			
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
-			
-			$status_update = "UPDATE gamestatus SET played_by='1', last_played='$card' WHERE s_id='0'";
+			$color = $deck[$card_p]->get_color();
+			$status_update = "UPDATE gamestatus SET played_by='1',current_color='$color', last_played='$card_p' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}elseif ($username === $r['user2']) {
 			
-			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card";
+			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card_p";
 			$mysqli->query($play);
 			
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
-			
-			$status_update = "UPDATE gamestatus SET played_by='2', last_played='$card' WHERE s_id='0'";
+			$color = $deck[$card_p]->get_color();
+			$status_update = "UPDATE gamestatus SET played_by='2',current_color='$color', last_played='$card_p' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}
@@ -238,7 +240,7 @@ function end_game(){
 	$deleteDeck = "TRUNCATE deck";
 	$mysqli->query($deleteDeck);
 
-	$resetStatus = "UPDATE gamestatus SET current_player='0', last_played='0', played_by='0', user1='', user2='' WHERE s_id='0'";
+	$resetStatus = "UPDATE gamestatus SET current_player='0', last_played='0', played_by='0',current_color='',user1='', user2='' WHERE s_id='0'";
 	$mysqli->query($resetStatus);
 
 	$mysqli->close();
