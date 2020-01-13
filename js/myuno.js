@@ -11,8 +11,8 @@ $(function()
 {
 	$('#game_login').click( login_to_game);
 	$('#draw_button').click( draw_card);
-	game_status_update();
 	$('#pass_button').click( pass_turn);
+	game_status_update();
 });
 
 function login_to_game()
@@ -24,6 +24,7 @@ function login_to_game()
 	{
 		alert('RESTARTING');
 		$.ajax({url: "Internal/API.php/end_game",method: "POST", success: refresh_page});
+		return;
 	}
 	user=document.getElementById("username").value;
 	document.getElementById("username").remove();
@@ -70,11 +71,12 @@ function game_status_update()
 }
 function update_status(data)//update listener
 {
-
 	last_update=new Date().getTime();
 	var old_turn = turn;
+	turn=0;
 	t=JSON.parse(data);
 	turn=t;
+	
 	clearTimeout(timer);
 
 	if(turn==0)
@@ -146,7 +148,7 @@ function print_card(new_card,place)//methodos gia tin emfanisi kartwn
 
 function pass_turn()//methodos gia na dwsei ton guro tou ston antipalo
 {
-	$.ajax({url: "Internal/API.php/set_turn/pass" ,method: 'POST'})
+	$.ajax({url: "Internal/API.php/set_turn/pass/pass" ,method: 'POST'});
 	give_turn();
 }
 
@@ -155,11 +157,22 @@ function try_play_card(card_id)
 {
 	if(can_play)
 	{
-		$.ajax({url: "Internal/API.php/set_turn/"+card_id ,method: 'POST'})
-		$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id, method: "PUT", success: play_card(card_id)});
+		$.ajax({url: "Internal/API.php/card_down", success: function(result){
+			dat=JSON.parse(result);
+			d_card=dat["card_id"];
+			$.ajax({url: "Internal/API.php/set_turn/"+card_id+"/"+d_card ,method: 'POST', success: function(result){
+				console.log(result);
+				dat=JSON.parse(result);
+				if(dat)
+				{
+					$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id, method: "PUT", success: play_card(card_id)});
+				}
+			}});
+		}});
 	}
-	
 }
+
+
 function play_card(card_id)
 {
 	var this_card = {};

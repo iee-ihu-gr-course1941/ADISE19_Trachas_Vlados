@@ -1,17 +1,32 @@
 <?php 
-require 'deck.php';
-function playable_card($down_c, $hand_c)
+
+
+function playable_card($hand_c, $down_c)
 {
-	if($deck[$down_c].get_number() == $deck[$hand_c].get_number())
+	require "deck.php";
+	$current_color="";
+	if($deck[$down_c]->get_color() == "black")
 	{
-		//playable
-	}else if($deck[$hand_c].get_color()=="black")
+
+	}else
 	{
-		//playable
-	}else if($deck[$down_c].get_color() == $deck[$hand_c].get_color() )
-	{
-		//playable
+		$current_color=$deck[$down_c]->get_color();
 	}
+
+	if($deck[$hand_c]->get_color()=="black")
+	{
+		change_color();
+		return true;
+	}else if(($deck[$down_c]->get_number() == $deck[$hand_c]->get_number()) || ($deck[$down_c]->get_color() == $deck[$hand_c]->get_color()))
+	{
+		return true;
+	}
+	return false;
+}
+
+function change_color()
+{
+
 }
 
 ?>
