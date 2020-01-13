@@ -26,7 +26,7 @@ switch ($r=array_shift($request)) {
 
 	case 'get_turn' : handle_get_player_turn($method);break;
 
-	case 'set_turn' : handle_set_player_turn($method,$request[0],$request[1]);break;
+	case 'set_turn' : handle_set_player_turn($method,$request[0],$request[1],$request[2]);break;
 
 	default: header("HTTP/1.1 404 Not Fount");break;
 }
@@ -109,9 +109,10 @@ function handle_get_player_turn($method){
 		header("HTTP/1.1 404 Wrong End");
 	}
 }
-function handle_set_player_turn($method,$card,$down_card){
+function handle_set_player_turn($method,$card,$down_card,$card_color){
 	if ($method === 'POST') {
-		set_turn($card,$down_card);
+		set_turn($card,$down_card,$card_color);
+		
 	}else{
 		header("HTTP/1.1 404 Wrong End");
 	}

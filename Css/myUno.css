@@ -113,3 +113,14 @@ button:hover{
 button:disabled{
 	background-color: red;
 }
+/*pop-up*/
+#change_color{
+	position: absolute;
+  	width: 380px;
+ 	height: 42px;
+  	z-index: 15;
+  	top: 50%;
+  	left: 50%;
+  	margin: -100px 0 0 -150px;
+  	visibility: hidden;
+}

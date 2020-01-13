@@ -12,6 +12,10 @@ $(function()
 	$('#game_login').click( login_to_game);
 	$('#draw_button').click( draw_card);
 	$('#pass_button').click( pass_turn);
+	$('#red_button').click( set_color);
+	$('#green_button').click( set_color);
+	$('#yellow_button').click( set_color);
+	$('#blue_button').click( set_color);
 	game_status_update();
 });
 
@@ -19,6 +23,7 @@ function login_to_game()
 {
 	if($('#username').val()=='') {
 		alert('You have to set a username');
+		refresh_page();
 		return;
 	}else if($('#username').val()=='RESTART')//an sto username balei "RESTART" teleiwnei to paixnidi kai kanei restart tin basi
 	{
@@ -120,7 +125,8 @@ function print_drawn_card(data)//emfanizei karta sto UI tou xeriou
 function print_down_card(data)//emfanizei tin karta pou paixtike sto UI
 {
 	new_card=JSON.parse(data);
-	print_card(new_card,"board_card");
+	new_card[0]["color"]=new_card[1];
+	print_card(new_card[0],"board_card");
 }
 
 function print_card(new_card,place)//methodos gia tin emfanisi kartwn
@@ -159,9 +165,14 @@ function try_play_card(card_id)
 	{
 		$.ajax({url: "Internal/API.php/card_down", success: function(result){
 			dat=JSON.parse(result);
-			d_card=dat["card_id"];
-			$.ajax({url: "Internal/API.php/set_turn/"+card_id+"/"+d_card ,method: 'POST', success: function(result){
-				console.log(result);
+			d_card=dat[0]["card_id"];
+			card_color=document.getElementById(card_id).style.background;
+			if(card_color=="black")
+			{
+				change_color(card_id,d_card);
+				return;
+			}
+			$.ajax({url: "Internal/API.php/set_turn/"+card_id+"/"+d_card+"/"+"no_change" ,method: 'POST', success: function(result){
 				dat=JSON.parse(result);
 				if(dat)
 				{
@@ -171,7 +182,40 @@ function try_play_card(card_id)
 		}});
 	}
 }
+var color_card_id = 0;
+var color_card_down = 0;
+function change_color(card_id,d_card)
+{
+	color_card_id=card_id;
+	color_card_down=d_card
+	document.getElementById("change_color").style.visibility = "visible";
+}
 
+function set_color()
+{
+	col="";
+	if(this.id=="red_button")
+	{
+		col="red";
+	}else if(this.id=="green_button")
+	{
+		col="green";
+	}else if(this.id=="yellow_button")
+	{
+		col="yellow";
+	}else
+	{
+		col="blue";
+	}
+	$.ajax({url: "Internal/API.php/set_turn/"+color_card_id+"/"+color_card_down+"/"+col ,method: 'POST', success: function(result){
+	dat=JSON.parse(result);
+	if(dat)
+	{
+		$.ajax({url: "Internal/API.php/play_card/"+user+"/"+color_card_id, method: "PUT", success: play_card(card_id)});
+	}
+	}});
+	document.getElementById("change_color").style.visibility = "hidden";
+}
 
 function play_card(card_id)
 {

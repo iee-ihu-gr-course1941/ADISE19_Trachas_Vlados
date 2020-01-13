@@ -7,7 +7,13 @@ function get_card_down(){
 	$result = $mysqli->query($sql);
 	$row = $result->fetch_assoc();
 	$id = $row['last_played'];
-	$data = $deck[$id];
+	$data[0] = $deck[$id];
+	//dinei kateuthian to xrwma pou einai katw se periptosi pou paixtike mauri karta
+	$sql = "SELECT current_color From gamestatus Where s_id='0'";
+	$result = $mysqli->query($sql);
+	$row = $result->fetch_assoc();
+	$data[1] = $row['current_color'];
+
 	echo json_encode( $data );
 	$mysqli->close();
 }
@@ -195,7 +201,7 @@ function play($username,$card_p){
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
 			$color = $deck[$card_p]->get_color();
-			$status_update = "UPDATE gamestatus SET played_by='1',current_color='$color', last_played='$card_p' WHERE s_id='0'";
+			$status_update = "UPDATE gamestatus SET played_by='1', last_played='$card_p' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}elseif ($username === $r['user2']) {
@@ -206,7 +212,7 @@ function play($username,$card_p){
 			$user1 = $r['user1'];
 			$user2 = $r['user2'];
 			$color = $deck[$card_p]->get_color();
-			$status_update = "UPDATE gamestatus SET played_by='2',current_color='$color', last_played='$card_p' WHERE s_id='0'";
+			$status_update = "UPDATE gamestatus SET played_by='2', last_played='$card_p' WHERE s_id='0'";
 			$mysqli->query($status_update);
 			
 		}
@@ -280,7 +286,7 @@ function get_turn(){
 	$mysqli->close();
 }
 
-function set_turn($card,$down_card){
+function set_turn($card,$down_card,$card_color){
 	require_once "dbconnect2.php";
 	require_once "deck.php";
 	require_once "card.php";
@@ -300,9 +306,21 @@ function set_turn($card,$down_card){
 			$mysqli->query($turn);
 		}
 	}else{
-		$can_play = playable_card($card,$down_card);
+		$sql = "SELECT current_color From gamestatus Where s_id='0'";
+		$result = $mysqli->query($sql);
+		$row = $result->fetch_assoc();
+		$col = $row['current_color'];
+		$can_play = playable_card($card,$down_card,$col);
 		if($can_play)
 		{
+			$next_color="";
+			if($card_color=="no_change")
+			{
+				$next_color=$deck[$card]->get_color();
+			}else
+			{
+				$next_color=$card_color;
+			}
 			$number = $deck[$card]->get_number();
 			if ($number!='B' AND $number!='R') 
 			{
@@ -312,14 +330,13 @@ function set_turn($card,$down_card){
 				$data = $row['current_player'];
 				if($number === "+2" OR $number === "+4") 
 				{
-					//$mysqli->close();
 					opponent_draw_cards($data,$number,$mysqli);
 				}
 				if($data == "2"){
-					$turn = "UPDATE gamestatus SET current_player='1' WHERE s_id='0'";
+					$turn = "UPDATE gamestatus SET current_player='1', current_color='$next_color'  WHERE s_id='0'";
 					$mysqli->query($turn);
 				}elseif($data == "1"){
-					$turn = "UPDATE gamestatus SET current_player='2' WHERE s_id='0'";
+					$turn = "UPDATE gamestatus SET current_player='2', current_color='$next_color' WHERE s_id='0'";
 					$mysqli->query($turn);
 				}
 			}
