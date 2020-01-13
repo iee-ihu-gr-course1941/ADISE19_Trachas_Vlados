@@ -46,8 +46,8 @@ function draw_card($username){
 	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
 	while ($r = mysqli_fetch_assoc($users)) {
 		if ($username === $r['user1']) {
-			$last_played = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
-			while($l= mysqli_fetch_assoc($last_played)){
+			$next_draw = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
+			while($l= mysqli_fetch_assoc($next_draw)){
 				$ls = $l['card_id'];
 			}			
 
@@ -59,8 +59,8 @@ function draw_card($username){
 
 
     	}elseif ($username === $r['user2']) {
-    		$last_played = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
-			while($l= mysqli_fetch_assoc($last_played)){
+    		$next_draw = mysqli_query($mysqli,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
+			while($l= mysqli_fetch_assoc($next_draw)){
 				$ls = $l['card_id'];
 			}			
 			
@@ -211,7 +211,7 @@ function play($username,$card){
 	$mysqli->close();
 }
 
-function login($username){
+function register($username){
 	require_once "dbconnect2.php";
 	$users = mysqli_query($mysqli,"SELECT DISTINCT user1,user2 FROM gamestatus");
 	while ($r = mysqli_fetch_assoc($users)) {
@@ -277,10 +277,11 @@ function get_turn(){
 	$mysqli->close();
 }
 
-function set_turn($card){
+function set_turn($card,$down_card){
 	require_once "dbconnect2.php";
 	require_once "deck.php";
 	require_once "card.php";
+	require_once "board.php";
 
 	if ($card == "pass") {
 		$sql = "SELECT current_player From gamestatus Where s_id='0'";
@@ -296,24 +297,89 @@ function set_turn($card){
 			$mysqli->query($turn);
 		}
 	}else{
-		$number = $deck[$card]->get_number();
-
-		if ($number!='B' AND $number!='R') {
-			$sql = "SELECT current_player From gamestatus Where s_id='0'";
-			$result = $mysqli->query($sql);
-			$row = $result->fetch_assoc();
-			$data = $row['current_player'];
-			
-			if($data == "2"){
-				$turn = "UPDATE gamestatus SET current_player='1' WHERE s_id='0'";
-				$mysqli->query($turn);
-			}elseif($data == "1"){
-				$turn = "UPDATE gamestatus SET current_player='2' WHERE s_id='0'";
-				$mysqli->query($turn);
+		$can_play = playable_card($card,$down_card);
+		if($can_play)
+		{
+			$number = $deck[$card]->get_number();
+			if ($number!='B' AND $number!='R') 
+			{
+				$sql = "SELECT current_player From gamestatus Where s_id='0'";
+				$result = $mysqli->query($sql);
+				$row = $result->fetch_assoc();
+				$data = $row['current_player'];
+				if($number === "+2" OR $number === "+4") 
+				{
+					//$mysqli->close();
+					opponent_draw_cards($data,$number,$mysqli);
+				}
+				if($data == "2"){
+					$turn = "UPDATE gamestatus SET current_player='1' WHERE s_id='0'";
+					$mysqli->query($turn);
+				}elseif($data == "1"){
+					$turn = "UPDATE gamestatus SET current_player='2' WHERE s_id='0'";
+					$mysqli->query($turn);
+				}
 			}
+			echo json_encode(true);
+		}else{
+			echo json_encode(false);
 		}
+		
 	}
 	
 	$mysqli->close();
+}
+
+function opponent_draw_cards($this_player,$number_of_cards,$mysql)
+{
+	require_once "deck.php";
+	require_once "dbconnect2.php";
+	$username="";
+	if($this_player=="2")
+	{
+		$sql = "SELECT user1 From gamestatus Where s_id='0'";
+		$result = $mysql->query($sql);
+		$row = $result->fetch_assoc();
+		$username = $row['user1'];
+	}elseif($this_player=="1")
+	{
+		$sql = "SELECT user2 From gamestatus Where s_id='0'";
+		$result = $mysql->query($sql);
+		$row = $result->fetch_assoc();
+		$username = $row['user2'];
+	}
+
+	$num=0;
+	if($number_of_cards==="+2")
+	{
+		$num=2;
+	}elseif ($number_of_cards==="+4") {
+		$num=4;
+	}
+	for($i=0; $i<$num; $i++)
+	{
+		$users = mysqli_query($mysql,"SELECT DISTINCT user1,user2 FROM gamestatus");
+		while ($r = mysqli_fetch_assoc($users)) {
+			if ($username === $r['user1']) {
+				$next_draw = mysqli_query($mysql,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
+				while($l= mysqli_fetch_assoc($next_draw)){
+					$ls = $l['card_id'];
+				}			
+
+				$h1 = "UPDATE deck Set card_status='user1' Where card_id='$ls'";
+	    		$mysql->query($h1);
+
+
+	    	}elseif ($username === $r['user2']) {
+	    		$next_draw = mysqli_query($mysql,"SELECT card_id FROM deck WHERE card_status='deck' AND deck_position=(Select MIN(deck_position) FROM deck WHERE card_status='deck')");
+				while($l= mysqli_fetch_assoc($next_draw)){
+					$ls = $l['card_id'];
+				}			
+				
+				$h2 = "UPDATE deck Set card_status='user2' Where card_id='$ls'";
+	    		$mysql->query($h2);
+	    	}
+		}
+	}
 }
 ?>
