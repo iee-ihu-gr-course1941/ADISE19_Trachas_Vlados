@@ -176,7 +176,7 @@ function try_play_card(card_id)
 				dat=JSON.parse(result);
 				if(dat)
 				{
-					$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id, method: "PUT", success: play_card(card_id)});
+					$.ajax({url: "Internal/API.php/play_card/"+user+"/"+card_id, method: "POST", success: play_card(card_id)});
 				}
 			}});
 		}});
