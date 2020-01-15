@@ -278,7 +278,7 @@ function opponent_hand($username){
 
 function get_turn(){
 	require_once "dbconnect2.php";
-	$sql = "SELECT current_player From gamestatus Where s_id='0'";
+	$sql = "SELECT current_player From GameStatus Where s_id='0'";
 	$result = $mysqli->query($sql);
 	$row = $result->fetch_assoc();
 	$data = $row['current_player'];
