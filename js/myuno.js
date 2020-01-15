@@ -211,7 +211,7 @@ function set_color()
 	dat=JSON.parse(result);
 	if(dat)
 	{
-		$.ajax({url: "Internal/API.php/play_card/"+user+"/"+color_card_id, method: "PUT", success: play_card(card_id)});
+		$.ajax({url: "Internal/API.php/play_card/"+user+"/"+color_card_id, method: "POST", success: play_card(card_id)});
 	}
 	}});
 	document.getElementById("change_color").style.visibility = "hidden";

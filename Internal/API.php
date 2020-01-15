@@ -63,7 +63,7 @@ function handle_start($method){
 }
 
 function handle_play($method,$username,$card){
-	if ($method === 'PUT'){
+	if ($method === 'POST'){
 		play($username,$card);
 	}else{
 		header("HTTP/1.1 404 Wrong End");
