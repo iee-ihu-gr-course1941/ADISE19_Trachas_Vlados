@@ -17,8 +17,13 @@
   </head>
 <body style="background-color:#ff751a;">
 
+<div id='change_color'>
+    <button id='red_button' style="background-color: red"></button>
+    <button id='green_button' style="background-color: green"></button>
+    <button id='yellow_button' style="background-color: yellow"></button>
+    <button id='blue_button' style="background-color: blue"></button>
+</div>
 <div id='opponent_hand'>
-
     <p id='opponent_cards'></p>
 </div>
 
