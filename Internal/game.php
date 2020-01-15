@@ -57,7 +57,7 @@ function draw_card($username){
 				$ls = $l['card_id'];
 			}			
 
-			$h1 = "UPDATE deck Set card_status='user1' Where card_id='$ls'";
+			$h1 = "UPDATE Deck Set card_status='user1' Where card_id='$ls'";
     		$mysqli->query($h1);
 
 			$card_info = $deck[$ls];
@@ -70,7 +70,7 @@ function draw_card($username){
 				$ls = $l['card_id'];
 			}			
 			
-			$h2 = "UPDATE deck Set card_status='user2' Where card_id='$ls'";
+			$h2 = "UPDATE Deck Set card_status='user2' Where card_id='$ls'";
     		$mysqli->query($h2);
 			
 			$card_info = $deck[$ls];
@@ -109,10 +109,10 @@ function deck_ended(){
         $h2[] = $row['card_id'];
     }
 
-   	$deleteDeck = "TRUNCATE deck";
+   	$deleteDeck = "TRUNCATE Deck";
 	$mysqli->query($deleteDeck);
 
-	$first = "INSERT INTO deck Values('$c_id','down','0')";
+	$first = "INSERT INTO Deck Values('$c_id','down','0')";
     $mysqli->query($first);
 	
     $count1 = count($h1);
@@ -122,21 +122,21 @@ function deck_ended(){
 
     $c=0;
     for ($i=1; $i < $count1+1 ; $i++) { 
-    	$d1 = "INSERT INTO deck Values('$h1[$c]','user1','$i')";
+    	$d1 = "INSERT INTO Deck Values('$h1[$c]','user1','$i')";
    		$mysqli->query($d1);
    		$c++;
     }
 
    	$c=0;
     for ($i=$count1+1; $i < $a+1 ; $i++) { 
-    	$d2 = "INSERT INTO deck Values('$h2[$c]','user2','$i')";
+    	$d2 = "INSERT INTO Deck Values('$h2[$c]','user2','$i')";
    		$mysqli->query($d2);
    		$c++;
     }
     $c=0;
     shuffle($cards_id);
     for ($i=$a+1; $i < 108 ; $i++) { 
-    	$dd = "INSERT INTO deck Values('$cards_id[$c]','deck','$i')";
+    	$dd = "INSERT INTO Deck Values('$cards_id[$c]','deck','$i')";
    		$mysqli->query($dd);
    		$c++;
     }
@@ -153,26 +153,26 @@ function start_game(){
 	$numbers=range(0,107);
     shuffle($numbers);
 
-	$delete = "TRUNCATE deck";
+	$delete = "TRUNCATE Deck";
 	$mysqli->query($delete);
 
     for ($i=1; $i < 108 ; $i++) { 
     	$position = $numbers[$i];
-    	$deck_s = "INSERT INTO deck Values('$i','deck','$position')";
+    	$deck_s = "INSERT INTO Deck Values('$i','deck','$position')";
     	$mysqli->query($deck_s);
     }
     
-    $first = "UPDATE deck Set card_status='down' Where deck_position='0'";
+    $first = "UPDATE Deck Set card_status='down' Where deck_position='0'";
 	$mysqli->query($first);
 
     for ($i=1; $i <8 ; $i++) { 
     	
-    	$h1 = "UPDATE deck Set card_status='user1' Where deck_position='$i'";
+    	$h1 = "UPDATE Deck Set card_status='user1' Where deck_position='$i'";
     	$mysqli->query($h1);
     }
     
     for ($i=8; $i <15 ; $i++) { 
-    	$h2 = "UPDATE deck Set card_status='user2' Where deck_position='$i'";
+    	$h2 = "UPDATE Deck Set card_status='user2' Where deck_position='$i'";
     	$mysqli->query($h2);
     }
     
@@ -195,7 +195,7 @@ function play($username,$card_p){
 	while ($r = mysqli_fetch_assoc($users)) {
 		if ($username === $r['user1']) {
 			
-			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card_p";
+			$play = "UPDATE Deck Set card_status='down' WHERE card_id=$card_p";
 			$mysqli->query($play);
 			
 			$user1 = $r['user1'];
@@ -206,7 +206,7 @@ function play($username,$card_p){
 			
 		}elseif ($username === $r['user2']) {
 			
-			$play = "UPDATE deck Set card_status='down' WHERE card_id=$card_p";
+			$play = "UPDATE Deck Set card_status='down' WHERE card_id=$card_p";
 			$mysqli->query($play);
 			
 			$user1 = $r['user1'];
@@ -243,7 +243,7 @@ function register($username){
 function end_game(){
 	require_once "dbconnect2.php";
 
-	$deleteDeck = "TRUNCATE deck";
+	$deleteDeck = "TRUNCATE Deck";
 	$mysqli->query($deleteDeck);
 
 	$resetStatus = "UPDATE GameStatus SET current_player='0', last_played='0', played_by='0',current_color='',user1='', user2='' WHERE s_id='0'";
@@ -386,7 +386,7 @@ function opponent_draw_cards($this_player,$number_of_cards,$mysql)
 					$ls = $l['card_id'];
 				}			
 
-				$h1 = "UPDATE deck Set card_status='user1' Where card_id='$ls'";
+				$h1 = "UPDATE Deck Set card_status='user1' Where card_id='$ls'";
 	    		$mysql->query($h1);
 
 
@@ -396,7 +396,7 @@ function opponent_draw_cards($this_player,$number_of_cards,$mysql)
 					$ls = $l['card_id'];
 				}			
 				
-				$h2 = "UPDATE deck Set card_status='user2' Where card_id='$ls'";
+				$h2 = "UPDATE Deck Set card_status='user2' Where card_id='$ls'";
 	    		$mysql->query($h2);
 	    	}
 		}
