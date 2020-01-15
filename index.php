@@ -10,10 +10,10 @@
     <title>Uno Card Game</title>
 
     <!-- calls -->
-    <link href="css/myUno.css?t=134" type="text/css" rel="stylesheet">
+    <link href="css/myUno.css" type="text/css" rel="stylesheet">
     <script src="bootstrap/jquery-3.2.1.min.js"></script>
     <script src="bootstrap/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/myuno.js?t=124"></script>
+    <script type="text/javascript" src="js/myuno.js"></script>
   </head>
 <body style="background-color:#ff751a;">
 

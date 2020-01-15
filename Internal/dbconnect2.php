@@ -1,5 +1,5 @@
 <?php
-$host='users.iee.ihu.gr';
+$host='localhost';
 $db = 'uno_db';
 require_once "db_upass.php";
 
