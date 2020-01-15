@@ -1,5 +1,5 @@
 <?php
 
 	$DB_PASS = 'mysql12345';
-	$DB_USER = 'it154549';
+	$DB_USER = 'root';
 ?>
