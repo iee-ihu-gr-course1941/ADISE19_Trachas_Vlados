@@ -1,6 +1,8 @@
 # ADISE19_Trachas_Vlados
 # Team: Trachanas Georgios,Vladimiros Spiridis
 # Project: UNO card game
+# Link Παιχνιδιού: https://users.iee.ihu.gr/~it154549/ADISE19_Trachas_Vlados/ 
+# Οδηγίες : Πριν κανετε log in δωστε ως ονομα την λεξη RESET και καντε refresh σε περιπτωση που δεν ξεκινησει το παιχνιδι απο την αρχη.
 
 # Περιγραφή παιχνιδιού
 
